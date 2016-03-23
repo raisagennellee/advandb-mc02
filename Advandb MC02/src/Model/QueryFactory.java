@@ -23,7 +23,16 @@ public class QueryFactory {
 	}
 	
 	public String getQuery(ArrayList<String> upperChoices, ArrayList<String> lowerChoices){
-		return "";
+		try{
+			if (upperChoices.isEmpty() && lowerChoices.isEmpty())
+				return "SELECT * FROM mc02.land";
+			else
+				return "SELECT * FROM mc02.harvest";
+
+		}
+		catch (NullPointerException e){
+			return "SELECT * FROM mc02.land";
+		}
 	}
 
 }

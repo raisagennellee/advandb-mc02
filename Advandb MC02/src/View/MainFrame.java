@@ -32,8 +32,9 @@ public class MainFrame extends JFrame {
     private ResultSet rs = null;
     private Controller c;
 	
-	public MainFrame(Controller c) {
+	public MainFrame(Controller c, ResultSet rs) {
 		this.c = c;
+		this.rs = rs;
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 650);
@@ -117,12 +118,13 @@ public class MainFrame extends JFrame {
 		label.setFont(new Font("SansSerif", Font.BOLD, 15));
 		
 		JPanel panelTemp = new JPanel();
+		panelTemp.setLayout(new BorderLayout());
 		panelTemp.setBorder(BorderFactory.createLineBorder(Color.gray));
 		panelTemp.setBackground(Color.lightGray);
 		
 		//where to get rs
-//		pane = new JScrollPane(createJTable(rs));
-//		panelTemp.add(pane);
+		pane = new JScrollPane(createJTable(rs));
+		panelTemp.add(pane, BorderLayout.CENTER);
 		
 		rightPanel.add(label, BorderLayout.NORTH);
 		rightPanel.add(panelTemp, BorderLayout.CENTER);
@@ -137,6 +139,7 @@ public class MainFrame extends JFrame {
 		try {
 			ResultSetMetaData mdata = rs.getMetaData();
 			int colCount = mdata.getColumnCount();		
+			System.out.println(colCount);
 			String[] colNames = getColumnNames(colCount, mdata);
 			dataModel.setColumnIdentifiers(colNames);
 			while (rs.next()) {
@@ -155,7 +158,7 @@ public class MainFrame extends JFrame {
 		String[] colNames = new String[colCount];
 		for (int i = 1; i <= colCount; i++) {
 			String col = mdata.getColumnName(i);
-			colNames[i] = col;
+			colNames[i-1] = col;
 		}
 		return colNames;
 	}

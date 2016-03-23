@@ -8,9 +8,9 @@ public class DBConnection {
 
     public static void initialize() {
         String driver = "com.mysql.jdbc.Driver";
-        String url = "jdbc:mysql://localhost:3306/db_hpq"; //insert schema name
+        String url = "jdbc:mysql://localhost:3306/mc02"; //insert schema name
         String user = "root";
-        String pass = "1234";
+        String pass = "abc123";
         connect = null;
 
         try {

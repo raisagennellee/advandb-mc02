@@ -10,8 +10,8 @@ public class Controller {
 	QueryFactory queryFactory;
 
 	public Controller(){
-		mainFrame = new MainFrame(this);
 		queryFactory = new QueryFactory();
+		mainFrame = new MainFrame(this, queryFactory.query(null, null));
 	}
 	
 	public void getResult(ArrayList<String> upperChoices, ArrayList<String> lowerChoices){
