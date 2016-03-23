@@ -1,21 +1,30 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+import javax.swing.table.DefaultTableModel;
 
 public class MainFrame extends JFrame {
 	private JPanel topPanel;
     private JPanel bottomPanel;
     private JPanel topCheckBoxPanel;
     private JPanel bottomCheckBoxPanel;
+    
+    private JScrollPane pane;
+    
+    private ResultSet rs = null;
 	
 	public MainFrame() {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -96,10 +105,76 @@ public class MainFrame extends JFrame {
 		JLabel label = new JLabel("Result", SwingConstants.CENTER);
 		label.setFont(new Font("SansSerif", Font.BOLD, 15));
 		
-		rightPanel.add(label, BorderLayout.NORTH);
 		JPanel panelTemp = new JPanel();
 		panelTemp.setPreferredSize(new Dimension(550, 280));
+		
+		//where to get rs
+		pane = new JScrollPane(createJTable(rs));
+		panelTemp.add(pane);
+		
+		rightPanel.add(label, BorderLayout.NORTH);
 		rightPanel.add(panelTemp, BorderLayout.SOUTH);
 		return rightPanel;
+	}
+	
+	public JTable createJTable(ResultSet rs) {
+		JTable table = new JTable();
+		DefaultTableModel dataModel = new DefaultTableModel();
+		table.setModel(dataModel);
+		
+		try {
+			ResultSetMetaData mdata = rs.getMetaData();
+			int colCount = mdata.getColumnCount();		
+			String[] colNames = getColumnNames(colCount, mdata);
+			dataModel.setColumnIdentifiers(colNames);
+			while (rs.next()) {
+				String[] rowData = new String[colCount];
+				for (int i = 1; i <= colCount; i++) {
+					rowData[i - 1] = rs.getString(i);
+				}
+				dataModel.addRow(rowData);
+			}
+		} catch (SQLException e) {}
+		
+		return table;
+	}
+	
+	public String[] getColumnNames(int colCount, ResultSetMetaData mdata) throws SQLException {
+		String[] colNames = new String[colCount];
+		for (int i = 1; i <= colCount; i++) {
+			String col = mdata.getColumnName(i);
+			colNames[i] = col;
+		}
+		return colNames;
+	}
+	
+	private void updateRowHeights(JTable table) {
+		try {
+			for (int row = 0; row < table.getRowCount(); row++) {
+				int rowHeight = table.getRowHeight();
+
+				for (int column = 0; column < table.getColumnCount(); column++) {
+					Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
+					rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+				}
+
+				table.setRowHeight(row, rowHeight);
+			}
+		} catch (ClassCastException e) {
+		}
+
+	}
+	
+	public void removeTable() {
+		pane.removeAll();
+		updateTable();
+	}
+	
+	public void updateTable() {
+		JTable table = createJTable(rs);
+		pane.add(table);
+		pane.revalidate();
+		pane.repaint();
+		updateRowHeights(table);
 	}
 }
