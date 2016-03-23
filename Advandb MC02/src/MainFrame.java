@@ -165,12 +165,8 @@ public class MainFrame extends JFrame {
 
 	}
 	
-	public void removeTable() {
-		pane.removeAll();
-		updateTable();
-	}
-	
 	public void updateTable() {
+		pane.removeAll();
 		JTable table = createJTable(rs);
 		pane.add(table);
 		pane.revalidate();
