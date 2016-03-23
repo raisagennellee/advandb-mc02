@@ -1,3 +1,4 @@
+package View;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -6,6 +7,10 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -16,6 +21,8 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.DefaultTableModel;
 
+import Controller.Controller;
+
 public class MainFrame extends JFrame {
 	private JPanel topPanel;
     private JPanel bottomPanel;
@@ -23,8 +30,10 @@ public class MainFrame extends JFrame {
     private JScrollPane pane;
     
     private ResultSet rs = null;
+    private Controller c;
 	
-	public MainFrame() {
+	public MainFrame(Controller c) {
+		this.c = c;
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(800, 650);
@@ -83,13 +92,17 @@ public class MainFrame extends JFrame {
 	}
 	
 	public void addTopChoices(String text) {
-		topPanel.add(new JCheckBox(text));
+		JCheckBox cb = new JCheckBox(text);
+		cb.addItemListener(new checkBoxListener());
+		topPanel.add(cb);
 		topPanel.revalidate();
 		topPanel.repaint();
 	}
 	
 	public void addBottomChoices(String text) {
-		bottomPanel.add(new JCheckBox(text));
+		JCheckBox cb = new JCheckBox(text);
+		cb.addItemListener(new checkBoxListener());
+		bottomPanel.add(cb);
 		bottomPanel.revalidate();
 		bottomPanel.repaint();
 	}
@@ -161,7 +174,6 @@ public class MainFrame extends JFrame {
 			}
 		} catch (ClassCastException e) {
 		}
-
 	}
 	
 	public void updateTable() {
@@ -171,5 +183,28 @@ public class MainFrame extends JFrame {
 		pane.revalidate();
 		pane.repaint();
 		updateRowHeights(table);
+	}
+	
+	public class checkBoxListener implements ItemListener{
+
+		@Override
+		public void itemStateChanged(ItemEvent arg0) {
+			ArrayList<String> upperChoices = new ArrayList<String>();
+			for( Component comp : topPanel.getComponents() ) {
+			   if( comp instanceof JCheckBox){
+				   if (((JCheckBox)comp).isSelected())
+					   upperChoices.add( ((JCheckBox)comp).getText() );
+			   }
+			}
+			ArrayList<String> lowerChoices = new ArrayList<String>();
+			for( Component comp : bottomPanel.getComponents() ) {
+			   if( comp instanceof JCheckBox){
+				   if (((JCheckBox)comp).isSelected())
+					   lowerChoices.add( ((JCheckBox)comp).getText() );
+			   }
+			}
+			c.getResult(upperChoices, lowerChoices);
+		}
+	    
 	}
 }
