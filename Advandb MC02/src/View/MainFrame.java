@@ -26,6 +26,7 @@ import Controller.Controller;
 public class MainFrame extends JFrame {
 	private JPanel topPanel;
     private JPanel bottomPanel;
+    private JPanel panelTemp;
     
     private JScrollPane pane;
     
@@ -117,13 +118,13 @@ public class MainFrame extends JFrame {
 		JLabel label = new JLabel("Result", SwingConstants.CENTER);
 		label.setFont(new Font("SansSerif", Font.BOLD, 15));
 		
-		JPanel panelTemp = new JPanel();
+		panelTemp = new JPanel();
 		panelTemp.setLayout(new BorderLayout());
 		panelTemp.setBorder(BorderFactory.createLineBorder(Color.gray));
 		panelTemp.setBackground(Color.lightGray);
 		
 		//where to get rs
-		pane = new JScrollPane(createJTable(rs));
+		JScrollPane pane = new JScrollPane(createJTable(rs));
 		panelTemp.add(pane, BorderLayout.CENTER);
 		
 		rightPanel.add(label, BorderLayout.NORTH);
@@ -180,12 +181,13 @@ public class MainFrame extends JFrame {
 	}
 	
 	public void updateTable(ResultSet rs) {
-		pane.removeAll();
+		panelTemp.removeAll();
 		JTable table = createJTable(rs);
-		pane.add(table);
-		pane.revalidate();
-		pane.repaint();
+		JScrollPane pane = new JScrollPane(table);
 		updateRowHeights(table);
+		panelTemp.add(pane, BorderLayout.CENTER);
+		panelTemp.revalidate();
+		panelTemp.repaint();
 	}
 	
 	public class checkBoxListener implements ItemListener{
