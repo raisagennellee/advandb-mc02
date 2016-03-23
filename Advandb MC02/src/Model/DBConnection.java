@@ -1,11 +1,12 @@
+package Model;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DBConnection {
 
-    private Connection connect;
+    private static Connection connect;
 
-    public DBConnection() {
+    public static void initialize() {
         String driver = "com.mysql.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/db_hpq"; //insert schema name
         String user = "root";
@@ -22,7 +23,10 @@ public class DBConnection {
 
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
+    	if (connect == null){
+    		initialize();
+    	}
         return connect;
     }
 }

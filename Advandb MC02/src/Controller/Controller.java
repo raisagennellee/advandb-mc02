@@ -1,22 +1,20 @@
 package Controller;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 
+import Model.QueryFactory;
 import View.MainFrame;
 
 public class Controller {
+	
+	MainFrame mainFrame;
+	QueryFactory queryFactory;
 
 	public Controller(){
-		new MainFrame(this);
+		mainFrame = new MainFrame(this);
+		queryFactory = new QueryFactory();
 	}
 	
-	public ResultSet getResult(ArrayList<String> upperChoices, ArrayList<String> lowerChoices){
-		for (String text: upperChoices){
-			System.out.println(text);
-		}
-		for (String text: lowerChoices){
-			System.out.println(text);
-		}
-		return null;
+	public void getResult(ArrayList<String> upperChoices, ArrayList<String> lowerChoices){
+		mainFrame.updateTable(queryFactory.query(upperChoices, lowerChoices));
 	}
 }

@@ -176,7 +176,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 	
-	public void updateTable() {
+	public void updateTable(ResultSet rs) {
 		pane.removeAll();
 		JTable table = createJTable(rs);
 		pane.add(table);
