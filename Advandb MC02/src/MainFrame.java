@@ -19,8 +19,6 @@ import javax.swing.table.DefaultTableModel;
 public class MainFrame extends JFrame {
 	private JPanel topPanel;
     private JPanel bottomPanel;
-    private JPanel topCheckBoxPanel;
-    private JPanel bottomCheckBoxPanel;
     
     private JScrollPane pane;
     
@@ -99,21 +97,22 @@ public class MainFrame extends JFrame {
 	public JPanel createRightPanel() {
 		JPanel rightPanel = new JPanel();
 		rightPanel.setLayout(new BorderLayout());
-		rightPanel.setBackground(Color.green);
-		rightPanel.setSize(new Dimension(rightPanel.getSize().width, this.getSize().height));
+		rightPanel.setPreferredSize(new Dimension(rightPanel.getSize().width, (int) (this.getSize().height*0.9) ));
+		rightPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
 		JLabel label = new JLabel("Result", SwingConstants.CENTER);
 		label.setFont(new Font("SansSerif", Font.BOLD, 15));
 		
 		JPanel panelTemp = new JPanel();
-		panelTemp.setPreferredSize(new Dimension(550, 280));
+		panelTemp.setBorder(BorderFactory.createLineBorder(Color.gray));
+		panelTemp.setBackground(Color.lightGray);
 		
 		//where to get rs
-		pane = new JScrollPane(createJTable(rs));
-		panelTemp.add(pane);
+//		pane = new JScrollPane(createJTable(rs));
+//		panelTemp.add(pane);
 		
 		rightPanel.add(label, BorderLayout.NORTH);
-		rightPanel.add(panelTemp, BorderLayout.SOUTH);
+		rightPanel.add(panelTemp, BorderLayout.CENTER);
 		return rightPanel;
 	}
 	
