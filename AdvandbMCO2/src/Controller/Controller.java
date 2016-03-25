@@ -11,10 +11,10 @@ public class Controller {
 
 	public Controller(){
 		queryFactory = new QueryFactory();
-		mainFrame = new MainFrame(this, queryFactory.query(null, null));
+		mainFrame = new MainFrame(this, queryFactory.getQuery(null, null));
 	}
 	
 	public void getResult(ArrayList<String> upperChoices, ArrayList<String> lowerChoices){
-		mainFrame.updateTable(queryFactory.query(upperChoices, lowerChoices));
+		mainFrame.updateTable(queryFactory.getQuery(upperChoices, lowerChoices));
 	}
 }

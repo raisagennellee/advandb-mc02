@@ -22,6 +22,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.table.DefaultTableModel;
 
 import Controller.Controller;
+import Model.Column;
+import Model.ComboBoxConstants;
 
 public class MainFrame extends JFrame {
 	private JPanel topPanel;
@@ -38,7 +40,7 @@ public class MainFrame extends JFrame {
 		this.rs = rs;
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(800, 650);
+		this.setSize(900, 650);
 		setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		this.setTitle("ADVANDB MCO2 - ");
 		this.setLayout(new RelativeLayout(RelativeLayout.X_AXIS));
@@ -46,20 +48,13 @@ public class MainFrame extends JFrame {
 		this.add(createControlPanel(), new Float(1) );
 		this.add(createRightPanel(), new Float(3));
 		this.setVisible(true);
-		this.test();
+		this.setCheckBoxOptions();
 	}
 	
-	public void test(){
-		ArrayList<String> columns = new ArrayList<String>();
-		columns.add(ViewLabels.COLUMN_1);
-		columns.add(ViewLabels.COLUMN_2);
-		columns.add(ViewLabels.COLUMN_3);
-		columns.add(ViewLabels.COLUMN_4);
-		columns.add(ViewLabels.COLUMN_5);
-		
-		for (String text: columns){
-			this.addTopChoices(text);
-			this.addBottomChoices(text);
+	public void setCheckBoxOptions(){
+		ArrayList<Column> columns = ComboBoxConstants.OPTIONS_QUERY;
+		for (Column col: columns){
+			this.addTopChoices(col.getName());
 		}
 	}
 	
@@ -140,7 +135,6 @@ public class MainFrame extends JFrame {
 		try {
 			ResultSetMetaData mdata = rs.getMetaData();
 			int colCount = mdata.getColumnCount();		
-			System.out.println(colCount);
 			String[] colNames = getColumnNames(colCount, mdata);
 			dataModel.setColumnIdentifiers(colNames);
 			while (rs.next()) {
