@@ -54,32 +54,45 @@ public class QueryFactory {
 			}
 			if (!(lowerChoices.isEmpty())){
 				Collections.sort(lowerChoices, new SecondWordComparator());
-				boolean isSame = false;
+				boolean isSame = false, editedWhere = false, editedHaving = false;
 				String addWhere = "";
 				for (int i = 0; i < lowerChoices.size(); i++){
 					String condition1 = lowerChoices.get(i);
 					String[] temp1 = condition1.split(" ");
-					if (i==0){
-						//where += "AND (";
-						where += "AND (" + condition1.substring(4, condition1.length()) + " \n";
-					}
-					if (i!=0){
-						if (isSame ){
-							where += condition1 + " \n";
-							System.out.println("where clause: " + condition1);
+					if (condition1.contains("SUM")){
+						if (!editedHaving){
+							having = "HAVING (" + condition1.substring(4, condition1.length()) + " \n";
 						}
 						else{
-							where += ") \n" + temp1[0] + "(" + condition1.substring(temp1[0].length(), condition1.length()) + " \n";
+							having += condition1 + " \n";
 						}
+						editedHaving = true;
+					}
+					else{
+						if (!editedWhere){
+							where += "AND (" + condition1.substring(4, condition1.length()) + " \n";
+						}
+						if (i!=0){
+							if (isSame ){
+								where += condition1 + " \n";
+							}
+							else{
+								where += ") \n" + temp1[0] + "(" + condition1.substring(temp1[0].length(), condition1.length()) + " \n";
+							}
+						}
+						editedWhere = true;
 					}
 					if (i == lowerChoices.size()-1){
-						where += ") \n";
 						break;
 					}
 					String condition2 = lowerChoices.get(i+1);
 					String[] temp2 = condition2.split(" ");
 					isSame = temp1[1].equals(temp2[1]);
 				}
+				if (editedHaving)
+					having += ") \n";
+				if (editedWhere)
+					where += ") \n";
 			}
 			
 			query = select + "\n" + from + where + groupby + having + orderby;

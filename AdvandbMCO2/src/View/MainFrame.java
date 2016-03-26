@@ -159,7 +159,7 @@ public class MainFrame extends JFrame {
 		funcList.add("<");
 		funcList.add(">=");
 		funcList.add("<=");
-		funcList.add("NOT EQUAL");
+		funcList.add("IS");
 		return funcList.stream().toArray(String[]::new);
 	}
 	
@@ -307,7 +307,10 @@ public class MainFrame extends JFrame {
 				   	}
 				}
 				else if (c instanceof JTextField){
-					text = "'" + (String) ((JTextField)c).getText() + "'";
+					text = (String) ((JTextField)c).getText();
+					if (!(text.equalsIgnoreCase("NULL") || text.equalsIgnoreCase("NOT NULL"))){
+						text = "'" + (String) ((JTextField)c).getText() + "'";
+					}
 				}
 				condition += text + " ";
 			}
