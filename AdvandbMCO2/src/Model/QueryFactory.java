@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class QueryFactory {
 	
@@ -32,14 +33,14 @@ public class QueryFactory {
 		String orderby = "";
 		String query = "";
 		try{
-			if (!(upperChoices.isEmpty() && lowerChoices.isEmpty())){
+			if (!(upperChoices.isEmpty())){
 				groupby = "GROUP BY ";
 				orderby = "ORDER BY ";
 				for (int i = 0; i < upperChoices.size(); i++){
 					String name = upperChoices.get(i);
 					select += ", " + ComboBoxConstants.findColumn(name).getColName() + " ";
-					if (i != upperChoices.size()-1)
-						groupby += i+1 + ", ";
+					//if (i != upperChoices.size()-1)
+					groupby += i+1 + ", ";
 					orderby += i+1 + ", ";
 				}
 				if (groupby.contains("1")){
@@ -48,7 +49,37 @@ public class QueryFactory {
 				else {
 					groupby = "";
 				}
+				orderby += upperChoices.size() + 1 + ", ";
 				orderby = orderby.substring(0, orderby.lastIndexOf(",")) + " \n";
+			}
+			if (!(lowerChoices.isEmpty())){
+				Collections.sort(lowerChoices, new SecondWordComparator());
+				boolean isSame = false;
+				String addWhere = "";
+				for (int i = 0; i < lowerChoices.size(); i++){
+					String condition1 = lowerChoices.get(i);
+					String[] temp1 = condition1.split(" ");
+					if (i==0){
+						//where += "AND (";
+						where += "AND (" + condition1.substring(4, condition1.length()) + " \n";
+					}
+					if (i!=0){
+						if (isSame ){
+							where += condition1 + " \n";
+							System.out.println("where clause: " + condition1);
+						}
+						else{
+							where += ") \n" + temp1[0] + "(" + condition1.substring(temp1[0].length(), condition1.length()) + " \n";
+						}
+					}
+					if (i == lowerChoices.size()-1){
+						where += ") \n";
+						break;
+					}
+					String condition2 = lowerChoices.get(i+1);
+					String[] temp2 = condition2.split(" ");
+					isSame = temp1[1].equals(temp2[1]);
+				}
 			}
 			
 			query = select + "\n" + from + where + groupby + having + orderby;

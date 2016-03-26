@@ -2,6 +2,7 @@ package View;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -15,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -29,6 +31,8 @@ public class MainFrame extends JFrame {
 	private JPanel topPanel;
     private JPanel bottomPanel;
     private JPanel panelTemp;
+    private JButton btnAdd;
+    private JButton btnSearch;
     
     private JScrollPane pane;
     
@@ -45,7 +49,7 @@ public class MainFrame extends JFrame {
 		this.setTitle("ADVANDB MCO2 - ");
 		this.setLayout(new RelativeLayout(RelativeLayout.X_AXIS));
 		
-		this.add(createControlPanel(), new Float(1) );
+		this.add(createControlPanel(), new Float(2) );
 		this.add(createRightPanel(), new Float(3));
 		this.setVisible(true);
 		this.setCheckBoxOptions();
@@ -65,10 +69,9 @@ public class MainFrame extends JFrame {
 		leftPanel.setMinimumSize(new Dimension(250, 600));
 		
         createTopPanel();
-        createBottomPanel();
         
         leftPanel.add(topPanel);
-        leftPanel.add(bottomPanel);
+        leftPanel.add(createBottomPanel());
         return leftPanel;
 	}
 	
@@ -80,12 +83,31 @@ public class MainFrame extends JFrame {
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 	}
 	
-	public void createBottomPanel() {
-		bottomPanel = new JPanel();
+	public JPanel createBottomPanel() {
+		JPanel panel = new JPanel();
 		Border border = BorderFactory.createTitledBorder("Slice & Dice");
 		Border margin = BorderFactory.createEmptyBorder(10,10,10,10);
-		bottomPanel.setBorder(new CompoundBorder(border, margin));
+		panel.setBorder(new CompoundBorder(border, margin));
+		panel.setLayout(new BorderLayout());
+		bottomPanel = new JPanel();
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+		panel.add(bottomPanel, BorderLayout.CENTER);
+		
+		JPanel addBtnContainer = new JPanel();
+		addBtnContainer.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		btnAdd = new JButton("+");
+		btnAdd.addActionListener(new filteringListener());
+		addBtnContainer.add(btnAdd);
+		panel.add(addBtnContainer, BorderLayout.NORTH);
+		
+		JPanel searchBtnContainer = new JPanel();
+		searchBtnContainer.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		btnSearch = new JButton("SEARCH");
+		btnSearch.addActionListener(new filteringListener());
+		searchBtnContainer.add(btnSearch);
+		panel.add(searchBtnContainer, BorderLayout.SOUTH);
+		
+		return panel;
 	}
 	
 	public void addTopChoices(String text) {
@@ -94,6 +116,77 @@ public class MainFrame extends JFrame {
 		topPanel.add(cb);
 		topPanel.revalidate();
 		topPanel.repaint();
+	}
+	
+	private void addFilteringOption(){
+		ArrayList<Column> columns = ComboBoxConstants.OPTIONS_QUERY;
+	    JPanel filterOption = new JPanel();
+	    filterOption.setLayout(new RelativeLayout(RelativeLayout.X_AXIS));
+	    if (bottomPanel.getComponents().length != 0){
+	    	JComboBox opList = new JComboBox(new String[] {"AND" , "OR"});
+		    opList.setSelectedIndex(0);
+		    filterOption.add(opList, new Float(1));
+	    }
+	    
+	    ArrayList<String> cols = new ArrayList<String>();
+	    for (Column c: columns){
+	    	cols.add(c.getName());
+	    }
+	    JComboBox colList = new JComboBox(cols.toArray());
+	    colList.setSelectedIndex(0);
+	    filterOption.add(colList, new Float(2));
+	    
+	    JComboBox funcList = new JComboBox(getFunctions());
+	    colList.setSelectedIndex(0);
+	    filterOption.add(funcList, new Float(2));
+	    
+	    JTextField text = new JTextField(10);
+	    filterOption.add(text, new Float(2));
+	    
+	    JButton btnRemove = new JButton("-");
+	    btnRemove.addActionListener(new filteringListener());
+	    filterOption.add(btnRemove, new Float (1));
+	    
+	    bottomPanel.add(filterOption);
+	    bottomPanel.revalidate();
+	    bottomPanel.repaint();
+	}
+	
+	private String[] getFunctions(){
+		ArrayList<String> funcList = new ArrayList<String>();
+		funcList.add("=");
+		funcList.add(">");
+		funcList.add("<");
+		funcList.add(">=");
+		funcList.add("<=");
+		funcList.add("NOT EQUAL");
+		return funcList.stream().toArray(String[]::new);
+	}
+	
+	public class filteringListener implements ActionListener{
+	    @Override
+		public void actionPerformed(ActionEvent e) {
+	    	JButton button = (JButton) e.getSource();
+	    	if (button == btnAdd){
+				addFilteringOption();
+	    	}
+	    	else if (button == btnSearch){
+	    		runQuery();
+	    	}
+	    	else {
+	    		JPanel panel = (JPanel)button.getParent();
+	    		removeFilteringOption(panel);
+	    	}
+		}
+	}
+	
+	private void removeFilteringOption(JPanel panel){
+		if (bottomPanel.getComponentZOrder(panel) == 0 && bottomPanel.getComponentCount() > 1){
+			((JPanel)bottomPanel.getComponent(1)).remove(((JPanel)bottomPanel.getComponent(1)).getComponent(0));
+		}
+		bottomPanel.remove(panel);
+		bottomPanel.revalidate();
+		bottomPanel.repaint();
 	}
 	
 	public void addBottomChoices(String text) {
@@ -185,25 +278,44 @@ public class MainFrame extends JFrame {
 	}
 	
 	public class checkBoxListener implements ItemListener{
-
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
-			ArrayList<String> upperChoices = new ArrayList<String>();
-			for( Component comp : topPanel.getComponents() ) {
-			   if( comp instanceof JCheckBox){
-				   if (((JCheckBox)comp).isSelected())
-					   upperChoices.add( ((JCheckBox)comp).getText() );
-			   }
-			}
-			ArrayList<String> lowerChoices = new ArrayList<String>();
-			for( Component comp : bottomPanel.getComponents() ) {
-			   if( comp instanceof JCheckBox){
-				   if (((JCheckBox)comp).isSelected())
-					   lowerChoices.add( ((JCheckBox)comp).getText() );
-			   }
-			}
-			c.getResult(upperChoices, lowerChoices);
+			runQuery();
 		}
-	    
+	}
+	
+	public void runQuery(){
+		ArrayList<String> upperChoices = new ArrayList<String>();
+		for( Component comp : topPanel.getComponents() ) {
+		   if( comp instanceof JCheckBox){
+			   if (((JCheckBox)comp).isSelected())
+				   upperChoices.add( ((JCheckBox)comp).getText() );
+		   }
+		}
+		ArrayList<String> lowerChoices = new ArrayList<String>();
+		for( Component comp : bottomPanel.getComponents() ) {
+			String condition = "";
+			for ( Component c : ((Container) comp).getComponents()){
+				String text = "";
+				if( c instanceof JComboBox){
+					text = (String)((JComboBox)c).getSelectedItem();
+				   	if (!(text.equals("AND") || text.equals("OR"))){
+				   		try{
+				   			text = ComboBoxConstants.findColumn(text).getColName();
+				   		}
+				   		catch (NullPointerException e){}
+				   	}
+				}
+				else if (c instanceof JTextField){
+					text = "'" + (String) ((JTextField)c).getText() + "'";
+				}
+				condition += text + " ";
+			}
+			if (!(condition.contains("AND") || condition.contains("OR"))){
+				condition = "AND " + condition;
+			}
+			lowerChoices.add(condition);
+		}
+		this.c.getResult(upperChoices, lowerChoices);
 	}
 }
