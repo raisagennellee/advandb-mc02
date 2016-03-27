@@ -9,14 +9,14 @@ public class ComboBoxConstants {
 	private static int FILTER = 1;
 
 	public static ArrayList<Column> OPTIONS_QUERY = new ArrayList<Column>(Arrays.asList(
-			new Column("croptype", "Type of Crop", FILTER),
-			new Column("flood_freq", "Flood Frequency", FILTER),
+			new Column("crop_type", "Type of Crop", FILTER),
+			new Column("flood_frequency", "Flood Frequency", FILTER),
 			new Column("drought", "Drought Frequency", FILTER),
-			new Column("u_chng_pcrop_y", "Reason of Crop Change", FILTER),
-			new Column("alp_area", "Farm Area", FILTER),
-			new Column("u_low_harv", "Reason of Low Harvest", FILTER),
-			new Column("u_low_harv_o_lb", "Other Low Harvest Reason", FILTER),
-			new Column("SUM(crop_vol)", "Crop Volume", FILTER)));
+			new Column("reason_for_change_in_crop", "Reason of Crop Change", FILTER),
+			new Column("area_of_farm", "Farm Area", FILTER),
+			new Column("low_harvest_reason", "Reason of Low Harvest", FILTER),
+			new Column("other_low_harvest_reason", "Other Low Harvest Reason", FILTER),
+			new Column("SUM(crop_volume)", "Crop Volume", FILTER)));
 		
 	public static Column findColumn(String name){
 		ArrayList<Column> cols = OPTIONS_QUERY;

@@ -23,7 +23,7 @@ public class QueryFactory {
 	}
 	
 	public ResultSet getQuery(ArrayList<String> upperChoices, ArrayList<String> lowerChoices){
-		String select = "SELECT hpq_hh_id ";
+		String select = "SELECT household_id";
 		String from = 	"FROM crop C, land L, harvest H, primecrop P \n";
 		String where = 	"WHERE C.land_id = L.land_id \n" + 
 							"AND C.harvest_id = H.harvest_id \n" + 
